@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root{
+  --white:#FFFFFF;
+  --forest:#1B4332;
+  --forest-deep:#122B21;
+  --gold:#C89B3C;
+  --sage:#6B8F71;
+  --ink:#22282C;
+  --line:#E7E5DE;
+  --muted:#5A6267;
+  --muted-light:#8A9095;
+  --danger:#B3261E;
+  --card-bg:#FFFFFF;
+}
+
+[data-theme="dark"]{
+  --white:#14211C;
+  --forest:#4E9C7A;
+  --forest-deep:#7FC7A4;
+  --gold:#D9B25C;
+  --sage:#8FBF9B;
+  --ink:#EAEDEA;
+  --line:#2A3B33;
+  --muted:#B7C0BB;
+  --muted-light:#8FA098;
+  --danger:#E06259;
+  --card-bg:#1B2A24;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  background:var(--white);
+  color:var(--ink);
+  font-family:'Inter', sans-serif;
+  -webkit-font-smoothing:antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+h1,h2,h3{ font-family:'Zilla Slab', serif; }
+a{ color:inherit; text-decoration:none; }
+
+.page-panel {
+  padding: 40px;
+}
+@media (max-width: 640px) {
+  .page-panel {
+    padding: 20px;
+  }
+}
+
+.form-narrow {
+  max-width: 420px;
+}
+.form-wide {
+  max-width: 600px;
+}
+@media (max-width: 640px) {
+  .form-narrow, .form-wide {
+    max-width: 100%;
+  }
+}
