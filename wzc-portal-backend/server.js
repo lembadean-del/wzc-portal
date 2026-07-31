@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
-
+  
 const certificateRoutes = require('./routes/certificates');
 const quizRoutes = require('./routes/quizzes');
 const enrollmentRoutes = require('./routes/enrollments');
@@ -25,10 +25,6 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '1mb' }));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
-  maxAge: '30d',
-  immutable: true
-}));
 
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/quizzes', quizRoutes);
@@ -44,6 +40,6 @@ app.use('/api/auth/login', loginLimiter);
 app.use('/api/courses', courseRoutes);
 app.use('/api/auth', authRoutes);
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
