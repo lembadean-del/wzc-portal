@@ -75,7 +75,7 @@ function App() {
   
 
           <h1 style={{ color: 'var(--forest-deep)', fontSize: '1.7rem', marginBottom: '28px' }}>Log in to your account</h1>
-          <p style={{fontSize: '10px', color: 'red'}}>DEBUG: {API_BASE_URL}</p>
+          
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '16px' }}>
               <label style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Email</label>
