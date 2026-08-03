@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { API_BASE_URL } from '../config';
 
 export default function StudentAssignments({ courseId }) {
   const [assignments, setAssignments] = useState([]);
@@ -12,7 +12,7 @@ export default function StudentAssignments({ courseId }) {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/assignments/course/${courseId}`, {
+    axios.get(`${API_BASE_URL}/api/assignments/course/${courseId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setAssignments(res.data));
   }, [courseId]);
@@ -22,7 +22,7 @@ export default function StudentAssignments({ courseId }) {
     setMessage('');
     setSubmissionText('');
     setFileUrl('');
-    axios.get(`http://localhost:5000/api/assignments/${assignment.id}/my-submission`, {
+    axios.get(`${API_BASE_URL}/api/assignments/${assignment.id}/my-submission`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setMySubmission(res.data);
@@ -38,7 +38,7 @@ export default function StudentAssignments({ courseId }) {
   const data = new FormData();
   data.append('file', file);
   try {
-    const res = await axios.post('http://localhost:5000/api/uploads', data, {
+    const res = await axios.post(`${API_BASE_URL}/api/uploads`, data, {
       headers: { Authorization: `Bearer ${token}` }
     });
     setFileUrl(res.data.url);
@@ -49,7 +49,7 @@ export default function StudentAssignments({ courseId }) {
   const handleSubmit = async () => {
     setMessage('');
     try {
-      const res = await axios.post(`http://localhost:5000/api/assignments/${activeAssignment.id}/submit`,
+      const res = await axios.post(`${API_BASE_URL}/api/assignments/${activeAssignment.id}/submit`,
         { submission_text: submissionText, file_url: fileUrl },
         { headers: { Authorization: `Bearer ${token}` } }
       );

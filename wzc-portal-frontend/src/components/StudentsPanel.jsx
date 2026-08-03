@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function StudentsPanel() {
   const [students, setStudents] = useState([]);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/auth/users?role=student', {
+    axios.get(`${API_BASE_URL}/api/auth/users?role=student`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setStudents(res.data));
   }, []);

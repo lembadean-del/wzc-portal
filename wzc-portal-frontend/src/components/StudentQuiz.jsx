@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function StudentQuiz({ courseId }) {
   const [quizzes, setQuizzes] = useState([]);
@@ -10,7 +11,7 @@ export default function StudentQuiz({ courseId }) {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/quizzes/course/${courseId}`, {
+    axios.get(`${API_BASE_URL}/api/quizzes/course/${courseId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setQuizzes(res.data));
   }, [courseId]);
@@ -19,7 +20,7 @@ export default function StudentQuiz({ courseId }) {
     setActiveQuiz(quiz);
     setResult(null);
     setAnswers({});
-    axios.get(`http://localhost:5000/api/quizzes/${quiz.id}/take`, {
+    axios.get(`${API_BASE_URL}/api/quizzes/${quiz.id}/take`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setQuestions(res.data));
   };
@@ -29,7 +30,7 @@ export default function StudentQuiz({ courseId }) {
   };
 
   const handleSubmit = async () => {
-    const res = await axios.post(`http://localhost:5000/api/quizzes/${activeQuiz.id}/submit`,
+    const res = await axios.post(`${API_BASE_URL}/api/quizzes/${activeQuiz.id}/submit`,
       { answers },
       { headers: { Authorization: `Bearer ${token}` } }
     );

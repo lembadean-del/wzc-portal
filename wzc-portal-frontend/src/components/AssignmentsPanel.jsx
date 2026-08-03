@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function AssignmentsPanel() {
   const [courses, setCourses] = useState([]);
@@ -19,7 +20,7 @@ export default function AssignmentsPanel() {
   const label = { fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '6px' };
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/courses', {
+    axios.get(`${API_BASE_URL}/api/courses`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCourses(res.data));
   }, [token]);
@@ -30,7 +31,7 @@ export default function AssignmentsPanel() {
     setSelectedAssignment(null);
     setSubmissions([]);
     if (!id) { setAssignments([]); return; }
-    axios.get(`http://localhost:5000/api/assignments/course/${id}`, {
+    axios.get(`${API_BASE_URL}/api/assignments/course/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setAssignments(res.data));
   };
@@ -42,7 +43,7 @@ export default function AssignmentsPanel() {
     setError('');
     if (!selectedCourse || !form.title) { setError('Select a course and enter a title'); return; }
     try {
-      const res = await axios.post('http://localhost:5000/api/assignments',
+      const res = await axios.post(`${API_BASE_URL}/api/assignments`,
         { course_id: selectedCourse, ...form },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -55,7 +56,7 @@ export default function AssignmentsPanel() {
 
   const openAssignment = (assignment) => {
     setSelectedAssignment(assignment);
-    axios.get(`http://localhost:5000/api/assignments/${assignment.id}/submissions`, {
+    axios.get(`${API_BASE_URL}/api/assignments/${assignment.id}/submissions`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setSubmissions(res.data));
   };
@@ -68,7 +69,7 @@ export default function AssignmentsPanel() {
     const { grade, feedback } = gradeForm[submissionId] || {};
     if (grade === undefined || grade === '') return;
     try {
-      await axios.patch(`http://localhost:5000/api/assignments/submissions/${submissionId}/grade`,
+      await axios.patch(`${API_BASE_URL}/api/assignments/submissions/${submissionId}/grade`,
         { grade, feedback },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
+
 
 export default function ResultsPanel() {
   const [courses, setCourses] = useState([]);
@@ -15,7 +17,7 @@ export default function ResultsPanel() {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/courses', {
+    axios.get(`${API_BASE_URL}/api/courses`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCourses(res.data));
   }, []);
@@ -26,7 +28,7 @@ export default function ResultsPanel() {
     setSelectedQuiz('');
     setResults([]);
     if (!id) { setQuizzes([]); return; }
-    axios.get(`http://localhost:5000/api/quizzes/course/${id}`, {
+    axios.get(`${API_BASE_URL}/api/quizzes/course/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setQuizzes(res.data));
   };
@@ -35,7 +37,7 @@ export default function ResultsPanel() {
     const id = e.target.value;
     setSelectedQuiz(id);
     if (!id) { setResults([]); return; }
-    axios.get(`http://localhost:5000/api/quizzes/${id}/results`, {
+    axios.get(`${API_BASE_URL}/api/quizzes/${id}/results`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setResults(res.data));
   };

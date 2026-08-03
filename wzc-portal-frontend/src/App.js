@@ -1,3 +1,4 @@
+// deploy test v2S
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
@@ -6,6 +7,7 @@ import StudentDashboard from './components/StudentDashboard';
 import InstructorDashboard from './components/InstructorDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import RegisterForm from './components/RegisterForm';
+import { API_BASE_URL } from './config';
 
 function App() {
   const [email, setEmail] = useState('');
@@ -19,7 +21,7 @@ function App() {
     const token = localStorage.getItem('token');
     if (!token) { setLoading(false); return; }
 
-    axios.get('http://localhost:5000/api/auth/me', {
+    axios.get(`${API_BASE_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then((res) => setUser(res.data))
@@ -31,7 +33,7 @@ function App() {
   e.preventDefault();
   setError('');
   try {
-    const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+    const res = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
     localStorage.setItem('token', res.data.token);
     window.location.href = '/'; // force a fresh reload to the correct dashboard
   } catch (err) {

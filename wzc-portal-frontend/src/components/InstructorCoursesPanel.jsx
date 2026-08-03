@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function InstructorCoursesPanel({ user }) {
   const [courses, setCourses] = useState([]);
@@ -8,7 +9,7 @@ export default function InstructorCoursesPanel({ user }) {
   const token = localStorage.getItem('token');
 
   const fetchCourses = () => {
-    axios.get('http://localhost:5000/api/courses', {
+    axios.get(`${API_BASE_URL}/api/courses`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCourses(res.data.filter((c) => c.created_by === user.id)));
   };
@@ -21,7 +22,7 @@ export default function InstructorCoursesPanel({ user }) {
     e.preventDefault();
     setError('');
     try {
-      await axios.post('http://localhost:5000/api/courses', form, {
+      await axios.post(`${API_BASE_URL}/api/courses`, form, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setForm({ title: '', description: '', category: '' });

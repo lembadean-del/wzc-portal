@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function ProfilePanel({ user }) {
   const [error, setError] = useState('');
@@ -16,10 +17,10 @@ export default function ProfilePanel({ user }) {
     const data = new FormData();
     data.append('file', file);
     try {
-      const uploadRes = await axios.post('http://localhost:5000/api/uploads', data, {
+      const uploadRes = await axios.post(`${API_BASE_URL}/api/uploads`, data, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      await axios.patch('http://localhost:5000/api/auth/me/photo',
+      await axios.patch(`${API_BASE_URL}/api/auth/me/photo`,
         { photo_url: uploadRes.data.url },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function LessonsPanel() {
   const [courses, setCourses] = useState([]);
@@ -10,13 +11,13 @@ export default function LessonsPanel() {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/courses', {
+    axios.get(`${API_BASE_URL}/api/courses`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCourses(res.data));
   }, []);
 
   const fetchLessons = (courseId) => {
-    axios.get(`http://localhost:5000/api/lessons/course/${courseId}`, {
+    axios.get(`${API_BASE_URL}/api/lessons/course/${courseId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setLessons(res.data));
   };
@@ -35,7 +36,7 @@ const handleFileSelect = async (e) => {
   const data = new FormData();
   data.append('file', file);
   try {
-    const res = await axios.post('http://localhost:5000/api/uploads', data, {
+    const res = await axios.post(`${API_BASE_URL}/api/uploads`, data, {
       headers: { Authorization: `Bearer ${token}` }
     });
     setForm({ ...form, pdf_url: res.data.url });
@@ -49,7 +50,7 @@ const handleFileSelect = async (e) => {
     setError('');
     if (!selectedCourse) { setError('Select a course first'); return; }
     try {
-      await axios.post('http://localhost:5000/api/lessons', { ...form, course_id: selectedCourse }, {
+      await axios.post(`${API_BASE_URL}/api/lessons`, { ...form, course_id: selectedCourse }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setForm({ title: '', content: '', video_url: '', pdf_url: '', order_index: 0 });

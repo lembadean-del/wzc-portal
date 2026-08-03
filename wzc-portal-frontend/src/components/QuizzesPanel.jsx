@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function QuizzesPanel() {
   const [courses, setCourses] = useState([]);
@@ -15,7 +16,7 @@ export default function QuizzesPanel() {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/courses', {
+    axios.get(`${API_BASE_URL}/api/courses`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCourses(res.data));
   }, [token]);
@@ -25,7 +26,7 @@ export default function QuizzesPanel() {
     setError('');
     if (!selectedCourse || !quizTitle) { setError('Select a course and enter a title'); return; }
     try {
-      const res = await axios.post('http://localhost:5000/api/quizzes',
+      const res = await axios.post(`${API_BASE_URL}/api/quizzes`,
         { course_id: selectedCourse, title: quizTitle },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -43,7 +44,7 @@ export default function QuizzesPanel() {
     setError('');
     if (!selectedQuiz) { setError('Select a quiz first'); return; }
     try {
-      const res = await axios.post(`http://localhost:5000/api/quizzes/${selectedQuiz.id}/questions`, qForm, {
+      const res = await axios.post(`${API_BASE_URL}/api/quizzes/${selectedQuiz.id}/questions`, qForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setQuestions([...questions, res.data]);

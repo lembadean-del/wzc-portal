@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
+
 
 export default function RegisterForm({ onSuccess, onSwitchToLogin }) {
   const [form, setForm] = useState({
@@ -13,7 +15,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }) {
     e.preventDefault();
     setError('');
     try {
-      await axios.post('http://localhost:5000/api/auth/register', form);
+      await axios.post(`${API_BASE_URL}/api/auth/register`, form);
       onSuccess();
     } catch (err) {
       setError(err.response?.data?.error || 'Something went wrong');

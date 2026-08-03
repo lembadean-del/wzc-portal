@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import InvestitureProgressRing from './InvestitureProgressRing';
+import { API_BASE_URL } from '../config';
 
 export default function StudentInvestiture() {
   const [data, setData] = useState({ requirements: [], percent: 0 });
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/investiture/me', {
+    axios.get(`${API_BASE_URL}/api/investiture/me`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setData(res.data));
   }, []);

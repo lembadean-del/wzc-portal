@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function InstructorsPanel() {
   const [instructors, setInstructors] = useState([]);
@@ -8,7 +9,7 @@ export default function InstructorsPanel() {
   const token = localStorage.getItem('token');
 
   const fetchInstructors = () => {
-    axios.get('http://localhost:5000/api/auth/users?role=instructor', {
+    axios.get(`${API_BASE_URL}/api/auth/users?role=instructor`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setInstructors(res.data));
   };
@@ -21,7 +22,7 @@ export default function InstructorsPanel() {
     e.preventDefault();
     setError('');
     try {
-      await axios.post('http://localhost:5000/api/auth/create-staff', form, {
+      await axios.post(`${API_BASE_URL}/api/auth/create-staff`, form, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setForm({ full_name: '', email: '', password: '', role: 'instructor' });

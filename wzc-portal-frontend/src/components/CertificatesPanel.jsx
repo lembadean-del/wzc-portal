@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function CertificatesPanel() {
   const [certificates, setCertificates] = useState([]);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/certificates', {
+    axios.get(`${API_BASE_URL}/api/certificates`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCertificates(res.data));
   }, []);
 
   const handleDownload = async (certId) => {
-    const res = await axios.get(`http://localhost:5000/api/certificates/${certId}/download`, {
+    const res = await axios.get(`${API_BASE_URL}/api/certificates/${certId}/download`, {
       headers: { Authorization: `Bearer ${token}` },
       responseType: 'blob'
     });

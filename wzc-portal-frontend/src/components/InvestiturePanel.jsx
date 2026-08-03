@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import InvestitureProgressRing from './InvestitureProgressRing';
+import { API_BASE_URL } from '../config';
 
 export default function InvestiturePanel() {
   const [courses, setCourses] = useState([]);
@@ -19,17 +20,17 @@ export default function InvestiturePanel() {
   const label = { fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '6px' };
 
   const fetchRequirements = () => {
-    axios.get('http://localhost:5000/api/investiture/requirements', {
+    axios.get(`${API_BASE_URL}/api/investiture/requirements`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setRequirements(res.data));
   };
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/courses', {
+    axios.get(`${API_BASE_URL}/api/courses`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCourses(res.data));
 
-    axios.get('http://localhost:5000/api/auth/users?role=student', {
+    axios.get(`${API_BASE_URL}/api/auth/users?role=student`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setStudents(res.data));
 
@@ -43,7 +44,7 @@ export default function InvestiturePanel() {
     setError('');
     if (!form.name) { setError('Name is required'); return; }
     try {
-      await axios.post('http://localhost:5000/api/investiture/requirements',
+      await axios.post(`${API_BASE_URL}/api/investiture/requirements`,
         { ...form, course_id: form.course_id || null },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -58,18 +59,18 @@ export default function InvestiturePanel() {
     const id = e.target.value;
     setSelectedStudent(id);
     if (!id) { setStudentData(null); return; }
-    axios.get(`http://localhost:5000/api/investiture/student/${id}`, {
+    axios.get(`${API_BASE_URL}/api/investiture/student/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setStudentData(res.data));
   };
 
   const handleToggle = async (requirementId, completed) => {
     try {
-      await axios.patch(`http://localhost:5000/api/investiture/${requirementId}/student/${selectedStudent}`,
+      await axios.patch(`${API_BASE_URL}/api/investiture/${requirementId}/student/${selectedStudent}`,
         { completed: !completed },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      const res = await axios.get(`http://localhost:5000/api/investiture/student/${selectedStudent}`, {
+      const res = await axios.get(`${API_BASE_URL}/api/investiture/student/${selectedStudent}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStudentData(res.data);

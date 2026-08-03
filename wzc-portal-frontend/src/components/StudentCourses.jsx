@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function StudentCourses({ onOpenCourse }) {
   const [courses, setCourses] = useState([]);
@@ -8,11 +9,11 @@ export default function StudentCourses({ onOpenCourse }) {
   const token = localStorage.getItem('token');
 
   const fetchData = () => {
-    axios.get('http://localhost:5000/api/courses', {
+    axios.get(`${API_BASE_URL}/api/courses`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setCourses(res.data));
 
-    axios.get('http://localhost:5000/api/enrollments/me', {
+    axios.get(`${API_BASE_URL}/api/enrollments/me`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setEnrollments(res.data));
   };
@@ -25,13 +26,13 @@ const handleDownloadCertificate = async (courseId) => {
   try {
     let certId;
     try {
-      const res = await axios.post('http://localhost:5000/api/certificates', { course_id: courseId }, {
+      const res = await axios.post(`${API_BASE_URL}/api/certificates`, { course_id: courseId }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       certId = res.data.id;
     } catch (err) {
       if (err.response?.status === 409) {
-        const existing = await axios.get(`http://localhost:5000/api/certificates/course/${courseId}`, {
+        const existing = await axios.get(`${API_BASE_URL}/api/certificates/course/${courseId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         certId = existing.data.id;
@@ -40,7 +41,7 @@ const handleDownloadCertificate = async (courseId) => {
       }
     }
 
-    const pdfRes = await axios.get(`http://localhost:5000/api/certificates/${certId}/download`, {
+    const pdfRes = await axios.get(`${API_BASE_URL}/api/certificates/${certId}/download`, {
       headers: { Authorization: `Bearer ${token}` },
       responseType: 'blob'
     });
@@ -60,7 +61,7 @@ const handleDownloadCertificate = async (courseId) => {
   const handleEnroll = async (courseId) => {
     setMessage('');
     try {
-      await axios.post('http://localhost:5000/api/enrollments', { course_id: courseId }, {
+      await axios.post(`${API_BASE_URL}/api/enrollments`, { course_id: courseId }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchData();

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import StudentQuiz from './StudentQuiz';
 import StudentAssignments from './StudentAssignments';
+import { API_BASE_URL } from '../config';
 
 function getYouTubeEmbedUrl(url) {
   if (!url) return null;
@@ -13,7 +14,7 @@ export default function StudentLessons({ courseId, onBack }) {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/lessons/course/${courseId}`, {
+    axios.get(`${API_BASE_URL}/api/lessons/course/${courseId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setLessons(res.data));
   }, [courseId]);
