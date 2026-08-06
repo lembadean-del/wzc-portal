@@ -24,6 +24,18 @@ router.post('/', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+// Public — no auth — for the homepage "Featured Courses" section
+router.get('/public', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, title, description, category FROM courses ORDER BY created_at DESC LIMIT 4'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 // List all courses — any logged-in user
 router.get('/', verifyToken, async (req, res) => {

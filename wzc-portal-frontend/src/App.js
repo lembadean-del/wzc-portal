@@ -7,7 +7,9 @@ import StudentDashboard from './components/StudentDashboard';
 import InstructorDashboard from './components/InstructorDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import RegisterForm from './components/RegisterForm';
+import Homepage from './components/Homepage';
 import { API_BASE_URL } from './config';
+
 
 function App() {
   const [email, setEmail] = useState('');
@@ -15,7 +17,9 @@ function App() {
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showRegister, setShowRegister] = useState(false);
+  const [showRegister, setShowRegister,] = useState(false);
+  const [showHome, setShowHome] = useState(true);
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -53,6 +57,17 @@ function App() {
   if (loading) return null;
 
   if (!user) {
+    if (showHome) {
+      return (
+        <div>
+          <Navbar />
+          <Homepage
+            onLoginClick={() => setShowHome(false)}
+            onRegisterClick={() => { setShowHome(false); setShowRegister(true); }}
+          />
+        </div>
+      );
+    }
     if (showRegister) {
       return (
         <div>
@@ -62,7 +77,6 @@ function App() {
       );
     }
     return (
-   
 
       <div>
         <Navbar />
