@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
@@ -8,6 +8,13 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }) {
     full_name: '', email: '', password: '', nrc_number: '', church: '', district: ''
   });
   const [error, setError] = useState('');
+  const [regStatus, setRegStatus] = useState(null); // null = still loading
+
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}/api/settings/registration`)
+      .then((res) => setRegStatus(res.data))
+      .catch(() => setRegStatus({ effectively_open: true })); // fail open so a settings hiccup doesn't block real registrations
+  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -28,12 +35,39 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }) {
   };
   const labelStyle = { fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '6px' };
 
+  if (regStatus && !regStatus.effectively_open) {
+    return (
+      <div style={{ maxWidth: '380px', margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
+        <div style={{ fontSize: '0.75rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600, marginBottom: '10px' }}>
+          Learn · Lead · Serve
+        </div>
+        <h1 style={{ color: 'var(--forest-deep)', fontSize: '1.5rem', marginBottom: '14px' }}>Registration is currently closed</h1>
+        <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+          {regStatus.deadline
+            ? `Registration closed on ${new Date(regStatus.deadline).toLocaleDateString()}. Please check back later or contact your church administrator.`
+            : 'Please check back later or contact your church administrator.'}
+        </p>
+        <p style={{ fontSize: '0.85rem' }}>
+          Already have an account?{' '}
+          <span onClick={onSwitchToLogin} style={{ color: 'var(--forest)', fontWeight: 600, cursor: 'pointer' }}>
+            Log in
+          </span>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: '380px', margin: '60px auto', padding: '0 20px' }}>
       <div style={{ fontSize: '0.75rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600, marginBottom: '10px' }}>
         Learn · Lead · Serve
       </div>
       <h1 style={{ color: 'var(--forest-deep)', fontSize: '1.7rem', marginBottom: '24px' }}>Create your account</h1>
+      {regStatus?.deadline && (
+        <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginBottom: '18px' }}>
+          Registration closes on {new Date(regStatus.deadline).toLocaleDateString()}.
+        </p>
+      )}
       <form onSubmit={handleSubmit}>
         <label style={labelStyle}>Full Name</label>
         <input name="full_name" value={form.full_name} onChange={handleChange} required style={inputStyle} />

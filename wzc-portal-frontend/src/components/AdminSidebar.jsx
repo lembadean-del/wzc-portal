@@ -1,6 +1,6 @@
 export default function AdminSidebar({ active, onSelect, open, onClose, isMobile, onLogout }) {
   const items = [
-    'Courses', 'Lessons', 'Quizzes', 'Assignments', 'Investiture', 'Students', 'Instructors', 'Results', 'Certificates', 'Profile'
+    'Courses', 'Lessons', 'Quizzes', 'Assignments', 'Investiture', 'Students', 'Instructors', 'Results', 'Certificates',  'Registration', 'Profile'
   ];
 
   if (!open) return null;

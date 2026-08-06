@@ -12,6 +12,7 @@ import InstructorsPanel from './InstructorsPanel';
 import ResultsPanel from './ResultsPanel';
 import CertificatesPanel from './CertificatesPanel';
 import ProfilePanel from './ProfilePanel';
+import RegistrationSettingsPanel from './RegistrationSettingsPanel';
 
 export default function AdminDashboard({ user, onLogout }) {
   const [active, setActive] = useState('Courses');
@@ -48,6 +49,7 @@ export default function AdminDashboard({ user, onLogout }) {
           isMobile={isMobile}
           onLogout={onLogout}
         />
+        {active === 'Registration' && <RegistrationSettingsPanel />}
         {active === 'Courses' && <CoursesPanel />}
         {active === 'Lessons' && <LessonsPanel />}
         {active === 'Quizzes' && <QuizzesPanel />}

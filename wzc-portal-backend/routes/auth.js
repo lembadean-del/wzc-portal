@@ -13,6 +13,14 @@ router.post('/register', async (req, res) => {
   }
 
   try {
+    const settingsCheck = await pool.query('SELECT is_open, deadline FROM registration_settings WHERE id = 1');
+    const settings = settingsCheck.rows[0];
+    const registrationOpen = settings
+      ? settings.is_open && (!settings.deadline || new Date() <= new Date(settings.deadline))
+      : true;
+    if (!registrationOpen) {
+      return res.status(403).json({ error: 'Registration is currently closed' });
+    }
     const hash = await bcrypt.hash(password, 10);
     const result = await pool.query(
       `INSERT INTO users (full_name, email, password_hash, role, nrc_number, church, district)
@@ -97,8 +105,8 @@ router.get('/users', verifyToken, requireAdmin, async (req, res) => {
   const { role } = req.query;
   try {
     const result = role
-      ? await pool.query('SELECT id, full_name, email, role FROM users WHERE role = $1 ORDER BY full_name ASC', [role])
-      : await pool.query('SELECT id, full_name, email, role FROM users ORDER BY full_name ASC');
+      ? await pool.query('SELECT id, full_name, email, role, nrc_number, church, district, created_at FROM users WHERE role = $1 ORDER BY full_name ASC', [role])
+      : await pool.query('SELECT id, full_name, email, role, nrc_number, church, district, created_at FROM users ORDER BY full_name ASC');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
