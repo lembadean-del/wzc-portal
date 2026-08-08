@@ -39,4 +39,38 @@ router.get('/course/:courseId', verifyToken, async (req, res) => {
   }
 });
 
+// Update a lesson — admin or instructor only
+router.patch('/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can edit lessons' });
+  }
+  const { title, content, video_url, pdf_url, order_index } = req.body;
+  if (!title) return res.status(400).json({ error: 'Title is required' });
+  try {
+    const result = await pool.query(
+      `UPDATE lessons SET title = $1, content = $2, video_url = $3, pdf_url = $4, order_index = $5 WHERE id = $6 RETURNING *`,
+      [title, content || null, video_url || null, pdf_url || null, order_index || 0, req.params.id]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Lesson not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete a lesson — admin or instructor only
+router.delete('/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can delete lessons' });
+  }
+  try {
+    const result = await pool.query('DELETE FROM lessons WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Lesson not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;

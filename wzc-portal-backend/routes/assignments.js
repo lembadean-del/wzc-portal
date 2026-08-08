@@ -119,4 +119,41 @@ router.patch('/submissions/:id/grade', verifyToken, async (req, res) => {
   }
 });
 
+// Update an assignment — admin or instructor only
+router.patch('/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can edit assignments' });
+  }
+  const { title, description, due_date } = req.body;
+  if (!title) return res.status(400).json({ error: 'Title is required' });
+  try {
+    const result = await pool.query(
+      `UPDATE assignments SET title = $1, description = $2, due_date = $3 WHERE id = $4 RETURNING *`,
+      [title, description || null, due_date || null, req.params.id]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Assignment not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete an assignment — admin or instructor only
+router.delete('/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can delete assignments' });
+  }
+  try {
+    const result = await pool.query('DELETE FROM assignments WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Assignment not found' });
+    res.json({ success: true });
+  } catch (err) {
+    if (err.code === '23503') {
+      return res.status(409).json({ error: 'Cannot delete: this assignment has student submissions.' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;

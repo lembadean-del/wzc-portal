@@ -94,4 +94,23 @@ router.patch('/:categoryId/student/:studentId', verifyToken, async (req, res) =>
   }
 });
 
+// Edit a category's name/max marks — admin only (categories themselves stay fixed at 7, no add/delete)
+router.patch('/categories/:id', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can edit categories' });
+  }
+  const { name, max_marks } = req.body;
+  if (!name || max_marks === undefined) return res.status(400).json({ error: 'name and max_marks are required' });
+  try {
+    const result = await pool.query(
+      'UPDATE investiture_categories SET name = $1, max_marks = $2 WHERE id = $3 RETURNING *',
+      [name, max_marks, req.params.id]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Category not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;

@@ -130,4 +130,40 @@ router.patch('/me/photo', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+// Update a user's name/email/role — admin only
+router.patch('/users/:id', verifyToken, requireAdmin, async (req, res) => {
+  const { full_name, email, role } = req.body;
+  if (!full_name || !email || !role) return res.status(400).json({ error: 'full_name, email, and role are required' });
+  try {
+    const result = await pool.query(
+      `UPDATE users SET full_name = $1, email = $2, role = $3 WHERE id = $4
+       RETURNING id, full_name, email, role, nrc_number, church, district`,
+      [full_name, email, role, req.params.id]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ error: 'That email is already in use' });
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete a user — admin only
+router.delete('/users/:id', verifyToken, requireAdmin, async (req, res) => {
+  if (String(req.user.id) === String(req.params.id)) {
+    return res.status(400).json({ error: "You can't delete your own account" });
+  }
+  try {
+    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true });
+  } catch (err) {
+    if (err.code === '23503') {
+      return res.status(409).json({ error: 'Cannot delete: this user has enrollments, submissions, or certificates on record.' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;

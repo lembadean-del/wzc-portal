@@ -124,4 +124,91 @@ router.get('/course/:courseId', verifyToken, async (req, res) => {
   }
 });
 
+// Update a quiz's title — admin or instructor only
+router.patch('/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can edit quizzes' });
+  }
+  const { title } = req.body;
+  if (!title) return res.status(400).json({ error: 'Title is required' });
+  try {
+    const result = await pool.query('UPDATE quizzes SET title = $1 WHERE id = $2 RETURNING *', [title, req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Quiz not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete a quiz — admin or instructor only
+router.delete('/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can delete quizzes' });
+  }
+  try {
+    const result = await pool.query('DELETE FROM quizzes WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Quiz not found' });
+    res.json({ success: true });
+  } catch (err) {
+    if (err.code === '23503') {
+      return res.status(409).json({ error: 'Cannot delete: this quiz has questions or student submissions.' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get one question with its correct answer — for pre-filling the edit form (admin/instructor only)
+router.get('/questions/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can view this' });
+  }
+  try {
+    const result = await pool.query('SELECT * FROM quiz_questions WHERE id = $1', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Question not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Update a question — admin or instructor only
+router.patch('/questions/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can edit questions' });
+  }
+  const { question_text, option_a, option_b, option_c, option_d, correct_option, order_index } = req.body;
+  if (!question_text || !option_a || !option_b || !option_c || !option_d || !correct_option) {
+    return res.status(400).json({ error: 'All question fields are required' });
+  }
+  try {
+    const result = await pool.query(
+      `UPDATE quiz_questions SET question_text=$1, option_a=$2, option_b=$3, option_c=$4, option_d=$5, correct_option=$6, order_index=$7
+       WHERE id = $8 RETURNING id, question_text, option_a, option_b, option_c, option_d, order_index`,
+      [question_text, option_a, option_b, option_c, option_d, correct_option.toUpperCase(), order_index || 0, req.params.id]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Question not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Delete a question — admin or instructor only
+router.delete('/questions/:id', verifyToken, async (req, res) => {
+  if (!['admin', 'instructor'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only admins or instructors can delete questions' });
+  }
+  try {
+    const result = await pool.query('DELETE FROM quiz_questions WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Question not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;

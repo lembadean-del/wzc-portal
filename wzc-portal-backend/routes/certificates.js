@@ -118,4 +118,18 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
+// Revoke/delete a certificate — admin only
+router.delete('/:id', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can revoke certificates' });
+  }
+  try {
+    const result = await pool.query('DELETE FROM certificates WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Certificate not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;
